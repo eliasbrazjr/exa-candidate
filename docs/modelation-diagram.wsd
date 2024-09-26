@@ -1,0 +1,68 @@
+@startuml
+
+device -> api: authentication
+api --> device: access_token
+
+device -> api: any request
+api -> api: validate token
+
+alt invalid token
+api --> device: invalid token
+end
+
+== task creation ==
+note over api: consider an authenticated request
+autonumber 1
+
+device -> api: create new task
+api -> api: validate fields
+api -> database: create task
+database --> api: task id
+api --> device: task created
+
+== task editing ==
+note over api: consider an authenticated request
+autonumber 1
+
+device -> api: update task
+api -> database: retrieve task by id
+
+alt not found
+api --> device: task not found
+end
+
+api -> api: validate fields
+api -> database: update task
+database --> api: task id
+api --> device: task updated
+
+== task done ==
+note over api: consider an authenticated request
+autonumber 1
+
+device -> api: mark task as completed
+api -> database: retrieve task by id
+
+alt not found
+api --> device: task not found
+end
+
+api -> database: mark task as completed
+database --> api
+api --> device: task updated
+
+== task filters ==
+note over api: consider an authenticated request
+autonumber 1
+
+device -> api: filtering tasks
+api --> api: validate filter
+api -> database: retrieve tasks by filters
+
+alt not found
+api --> device: list empty
+end
+
+api --> device: task list
+
+@enduml
